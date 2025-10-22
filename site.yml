@@ -1,0 +1,50 @@
+
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: update repository index
+    tags: always
+    apt:
+      update_cache: yes
+    when: ansible_distribution_version == "Ubuntu"
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_server
+  become: true
+  tasks:
+
+  - name: install apache2 and php packages for Ubuntu
+    tags: apache,apache2,ubuntu 
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest   
+    when: ansible_distribution == "Ubuntu"
+  - name: copy default html file for site
+    tags: apache,apache2,httpd
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+- hosts: prod_server
+  become: true
+  tasks:
+  
+  - name: install mariadb package (Ubuntu)
+    tags: mariadb
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
