@@ -29,6 +29,7 @@
         - libapache2-mod-php
       state: latest   
     when: ansible_distribution == "Ubuntu"
+ 
   - name: copy default html file for site
     tags: apache,apache2,httpd
     copy:
@@ -37,6 +38,7 @@
       owner: root
       group: root
       mode: 0644
+
 - hosts: prod_server
   become: true
   tasks:
