@@ -5,17 +5,29 @@
   become: true
   tasks:
 
-  - name: update repository index
-    tags: always
-    apt:
-      update_cache: yes
-    when: ansible_distribution_version == "Ubuntu"
-
   - name: install updates (Ubuntu)
     tags: always
     apt:
       upgrade: dist
+      update_cache: yes
     when: ansible_distribution == "Ubuntu"
+
+- hosts: workstation
+  become: true
+  tasks:
+
+  - name: install unzip
+    package:
+      name: unzip
+
+  - name: install terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/0.12.28.terraform_0.12.28_linux.amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
 
 - hosts: web_server
   become: true
@@ -29,9 +41,10 @@
         - libapache2-mod-php
       state: latest   
     when: ansible_distribution == "Ubuntu"
- 
+
+
   - name: copy default html file for site
-    tags: apache,apache2,httpd
+    tags: apache,apache2
     copy:
       src: default_site.html
       dest: /var/www/html/index.html
@@ -49,4 +62,3 @@
       name: mariadb-server
       state: latest
     when: ansible_distribution == "Ubuntu"
-
